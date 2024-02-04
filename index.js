@@ -1,32 +1,31 @@
 const { Client, GatewayIntentBits, Partials, Collection } = require('discord.js');
-const client = new Client({
-	intents: [
-		GatewayIntentBits.Guilds, 
-		GatewayIntentBits.GuildMessages, 
-		GatewayIntentBits.GuildPresences, 
-		GatewayIntentBits.GuildMessageReactions, 
-		GatewayIntentBits.DirectMessages,
-		GatewayIntentBits.MessageContent
-	], 
-	partials: [Partials.Channel, Partials.Message, Partials.User, Partials.GuildMember, Partials.Reaction] 
-});
-
 const fs = require('fs');
-const config = require('./config.json');
-require('dotenv').config() // remove this line if you are using replit
+const figlet = require('figlet');
+const chalk = require('chalk');
+require('dotenv').config()
+const { connection } = require('./system_logic/database');
+
+const client = new Client({
+    intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildPresences, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.DirectMessages, GatewayIntentBits.MessageContent],
+    partials: [Partials.Channel, Partials.Message, Partials.User, Partials.GuildMember, Partials.Reaction]
+});
 
 client.commands = new Collection()
 client.aliases = new Collection()
 client.slashCommands = new Collection();
 client.buttons = new Collection();
-client.prefix = config.prefix;
 
-module.exports = client;
+module.exports = { client, connection };
 
-
-fs.readdirSync('./handlers').forEach((handler) => {
-  require(`./handlers/${handler}`)(client)
+const message = process.env.STATE.toLowerCase() === 'dev' ? '[SYSTEM]: Booted into development mode, this should only be used in a development environment.' : '[SYSTEM]: Booted into production mode, this should only be used in a production environment.';
+figlet('Nexeum Studios', (err, data) => {
+	if (err) { return console.error('An error occurred while generating figlet text:', err); }
+	console.log(chalk.blue("-".repeat(75) + "\n" + data + "\n" + "-".repeat(75)));
+	console.log(chalk.green(message));
 });
 
+fs.readdirSync('./handler_logic/handlers').forEach((handler) => {
+    require(`./handler_logic/handlers/${handler}`)(client)
+});
 
 client.login(process.env.TOKEN)
