@@ -1,0 +1,1 @@
+This is the unified, main base template, we use for all of our Discord Bots at Nexeum Studios. This template was originally created by [Nathaniel](Nathaniel-VFX) and has since been adapted over the months to the needs of our team and our systems. 
